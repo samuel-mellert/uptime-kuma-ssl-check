@@ -25,7 +25,7 @@ def send_to_uptime_kuma(url, status, msg):
 
 host = os.getenv("HOST")
 port = int(os.getenv("PORT"))
-minimum_validity_days = int(os.getenv("MINIMUM_VALIDITY_DAYS"))
+minimum_validity_days = int(os.getenv("MINIMUM_VALIDITY_DAYS", 30))
 uptime_kuma_push_url = os.getenv("UPTIME_KUMA_PUSH_URL")
 
 try:

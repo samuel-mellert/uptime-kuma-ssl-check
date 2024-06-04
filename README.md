@@ -25,12 +25,13 @@ docker run --rm \
 
 ## Cronjob configuration
 You can configure a Push Monitor with a heartbeet interval of 3600 seconds and execute the script every hour.
+The `MINIMUM_VALIDITY_DAYS` parameter is _optional_ and will default to `30 days`.
 
 ```bash
 crontab -e
 
 # add this to you crontab to run the service every hour
-0 * * * * docker run --rm -e HOST=your-mail-server.com -e PORT=465 -e UPTIME_KUMA_URL=http://your-uptime-kuma-instance/api/push/YOUR_PUSH_ID samuelme/uptime-kuma-ssl-check:latest
+0 * * * * docker run --rm -e HOST=your-mail-server.com -e PORT=465 -e UPTIME_KUMA_PUSH_URL=http://your-uptime-kuma-instance/api/push/YOUR_PUSH_ID samuelme/uptime-kuma-ssl-check:latest
 ```
 
 
