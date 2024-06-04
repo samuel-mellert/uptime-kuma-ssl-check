@@ -27,16 +27,23 @@ host = os.getenv("HOST")
 port = int(os.getenv("PORT"))
 minimum_validity_days = int(os.getenv("MINIMUM_VALIDITY_DAYS", 30))
 uptime_kuma_push_url = os.getenv("UPTIME_KUMA_PUSH_URL")
+heartbeat_interval = int(os.getenv("HEARTBEAT_INTERVAL", 0))
 
-try:
-    expiry = get_certificate_expiry(host, port)
-    now = datetime.datetime.now(datetime.timezone.utc)
-    days_left = (expiry - now).days
-    msg = f"SSL Expiry for {host}:{port} is in {days_left} days"
-    if days_left < minimum_validity_days:
-        status = "down"        
+while True:    
+    try:
+        expiry = get_certificate_expiry(host, port)
+        now = datetime.datetime.now(datetime.timezone.utc)
+        days_left = (expiry - now).days
+        msg = f"SSL Expiry for {host}:{port} is in {days_left} days"
+        if days_left < minimum_validity_days:
+            status = "down"        
+        else:
+            status = "up"
+        send_to_uptime_kuma(uptime_kuma_push_url, status, msg)
+    except Exception as e:
+        send_to_uptime_kuma(uptime_kuma_push_url, "down", str(e))
+
+    if (heartbeat_interval > 0):
+        sleep(heartbeat_interval)
     else:
-        status = "up"
-    send_to_uptime_kuma(uptime_kuma_push_url, status, msg)
-except Exception as e:
-    send_to_uptime_kuma(uptime_kuma_push_url, "down", str(e))
+        break
