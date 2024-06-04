@@ -44,6 +44,6 @@ while True:
         send_to_uptime_kuma(uptime_kuma_push_url, "down", str(e))
 
     if (heartbeat_interval > 0):
-        sleep(heartbeat_interval)
+        time.sleep(heartbeat_interval)
     else:
         break
