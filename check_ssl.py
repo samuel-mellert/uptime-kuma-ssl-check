@@ -6,8 +6,19 @@ from dotenv import load_dotenv
 import smtplib
 import os
 import time
+import logging
 
 load_dotenv()
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 def get_certificate_expiry(host, port, use_starttls=False):
     context = ssl.create_default_context()
@@ -31,7 +42,9 @@ def send_to_uptime_kuma(url, status, msg):
         "status": status,
         "msg": msg
     }
-    requests.get(url, params=params)
+    response = requests.get(url, params=params)
+    logger.debug(f"Sent to Uptime Kuma: {status} - {msg}")
+    logger.debug(f"Response: {response.status_code}, {response.text}")
 
 host = os.getenv("HOST")
 port = int(os.getenv("PORT"))
@@ -53,10 +66,13 @@ while True:
         else:
             status = "up"
         send_to_uptime_kuma(uptime_kuma_push_url, status, msg)
+        logger.info(f"status: {status}; {msg}")
     except Exception as e:
         send_to_uptime_kuma(uptime_kuma_push_url, "down", str(e))
+        logger.error(f"status: {status}; {msg}")
 
     if (heartbeat_interval > 0):
+        logger.debug(f"Next check execution in {heartbeat_interval} seconds")
         time.sleep(heartbeat_interval)
     else:
         break
